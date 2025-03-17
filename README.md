@@ -26,5 +26,5 @@ Run `install.packages("iBART")` within R.
 
 ### Install iBART via devtools
 
-Run `devtools::install_github("YunkeW/iBART", INSTALL_opts = "--no-multriarch", build_vignettes = TRUE)` within R.
+Run `devtools::install_github("YunkeW/iBart", INSTALL_opts = "--no-multriarch", build_vignettes = TRUE)` within R.
 
