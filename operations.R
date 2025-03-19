@@ -1,3 +1,31 @@
+# checks correlation threshold
+heuristic_check <- function(feature, y, threshold = 0.1) {
+  abs(cor(feature, y, use = "complete.obs")) > threshold
+}
+
+# Constant optimization via coarse grid search
+optimize_constant <- function(feature_func, X_cols, y, candidate_constants = seq(-1, 1, by = 0.5)) {
+  best_c <- NULL
+  best_corr <- -Inf
+  for (c in candidate_constants) {
+    transformed_feature <- feature_func(X_cols, c = c)
+    corr <- abs(cor(transformed_feature, y, use = "complete.obs"))
+    if (exists("best_corr")) {
+      if (corr > best_corr) {
+        best_corr <- corr
+        best_c <- c
+      }
+    } else {
+      best_corr <- corr
+      best_c <- c
+    }
+  }
+  # Final optimization using BFGS
+  objective <- function(c) -abs(cor(feature_func(X_cols, c), y, use = "complete.obs"))
+  final_opt <- optim(par = best_c, fn = objective_func, method = "BFGS")
+  return(final_feature <- feature_func(X_cols, final_feature_c <- final_feature$par))
+}
+
 ##### Binary Operations #####
 ADD <- function(dat) {
   if (is.null(dat$unit)) {
