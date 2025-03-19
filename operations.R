@@ -287,7 +287,7 @@ MINUS <- function(dat) {
   }
 }
 
-MULTI <- function(dat) {
+MULTI <- function(dat, y, candidate_constants = seq(-1, 1, 0.5)) {
   p <- ncol(dat$X)
   df_out <- list(X = matrix(0, nrow = nrow(dat$X), ncol = choose(p, 2)),
                  unit = if (is.null(dat$unit)) NULL else matrix(0, nrow = nrow(dat$unit), ncol = choose(p, 2)),
@@ -296,7 +296,18 @@ MULTI <- function(dat) {
   if (is.null(dat$unit)) {
     for (i in 1:(p-1)) {
       for (j in (i+1):p) {
-        df_out$X[, count] <- dat$X[, i] * dat$X[, j]
+         feature_plain <- dat$X[, i] * dat$X[, j]
+      # Check heuristic
+        if (heuristic_check(feature_plain, y)) {
+          df_out$X[, count] <- optimize_constant(
+            feature_func = function(X, c) (X[, 1] + c) * X[, 2],
+            X_cols = dat$X[, c(i, j)],
+            y = y,
+            candidate_constants = candidate_constants
+          )
+        } else {
+          df_out$X[, count] <- feature_plain
+        }
         df_out$name[count] <- paste0("(", dat$name[i], "*", dat$name[j], ")")
         count <- count + 1
       }
@@ -304,7 +315,18 @@ MULTI <- function(dat) {
   } else {
     for (i in 1:(p-1)) {
       for (j in (i+1):p) {
-        df_out$X[, count] <- dat$X[, i] * dat$X[, j]
+        feature_plain <- dat$X[, i] * dat$X[, j]
+      # Check heuristic
+        if (heuristic_check(feature_plain, y)) {
+          df_out$X[, count] <- optimize_constant(
+            feature_func = function(X, c) (X[, 1] + c) * X[, 2],
+            X_cols = dat$X[, c(i, j)],
+            y = y,
+            candidate_constants = candidate_constants
+          )
+        } else {
+          df_out$X[, count] <- feature_plain
+        }
         df_out$unit[, count] <- dat$unit[, i] + dat$unit[, j]
         df_out$name[count] <- paste0("(", dat$name[i], "*", dat$name[j], ")")
         count <- count + 1
@@ -344,10 +366,33 @@ DIVD <- function(dat) {
     if (p_nonzero > 1) {
       for (i in 1:(p_nonzero - 1)) {
         for (j in (i + 1):p_nonzero) {
-          df_out$X[, count] <- dat$X[, i] / dat$X[, j]
+          feature_plain <- dat$X[, i] / dat$X[, j]
+      # Check heuristic
+        if (heuristic_check(feature_plain, y)) {
+          df_out$X[, count] <- optimize_constant(
+            feature_func = function(X, c) (X[, 1] + c) / X[, 2],
+            X_cols = dat$X[, c(i, j)],
+            y = y,
+            candidate_constants = candidate_constants
+          )
+        } else {
+          df_out$X[, count] <- feature_plain
+        }
           df_out$name[count] <- paste0("(", dat$name[i], "/", dat$name[j], ")")
           count <- count + 1
-          df_out$X[, count] <- dat$X[, j] / dat$X[, i]
+          
+          feature_plain <- dat$X[, j] / dat$X[, i]
+      # Check heuristic
+        if (heuristic_check(feature_plain, y)) {
+          df_out$X[, count] <- optimize_constant(
+            feature_func = function(X, c) (X[, 2] + c) / X[, 1],
+            X_cols = dat$X[, c(i, j)],
+            y = y,
+            candidate_constants = candidate_constants
+          )
+        } else {
+          df_out$X[, count] <- feature_plain
+        }
           df_out$name[count] <- paste0("(", dat$name[j], "/", dat$name[i], ")")
           count <- count + 1
         }
@@ -358,7 +403,18 @@ DIVD <- function(dat) {
     if ((p_nonzero > 0) & (p_zero > 0)) {
       for (i in (p_nonzero + 1):p) {
         for (j in 1:p_nonzero) {
-          df_out$X[, count] <- dat$X[, i] / dat$X[, j]
+          feature_plain <- dat$X[, i] / dat$X[, j]
+      # Check heuristic
+        if (heuristic_check(feature_plain, y)) {
+          df_out$X[, count] <- optimize_constant(
+            feature_func = function(X, c) (X[, 1] + c) / X[, 2],
+            X_cols = dat$X[, c(i, j)],
+            y = y,
+            candidate_constants = candidate_constants
+          )
+        } else {
+          df_out$X[, count] <- feature_plain
+        }
           df_out$name[count] <- paste0("(", dat$name[i], "/", dat$name[j], ")")
           count <- count + 1
         }
@@ -369,11 +425,34 @@ DIVD <- function(dat) {
     if (p_nonzero > 1) {
       for (i in 1:(p_nonzero - 1)) {
         for (j in (i + 1):p_nonzero) {
-          df_out$X[, count] <- dat$X[, i] / dat$X[, j]
+          feature_plain <- dat$X[, i] / dat$X[, j]
+      # Check heuristic
+        if (heuristic_check(feature_plain, y)) {
+          df_out$X[, count] <- optimize_constant(
+            feature_func = function(X, c) (X[, 1] + c) / X[, 2],
+            X_cols = dat$X[, c(i, j)],
+            y = y,
+            candidate_constants = candidate_constants
+          )
+        } else {
+          df_out$X[, count] <- feature_plain
+        }
           df_out$unit[, count] <- dat$unit[, i] - dat$unit[, j]
           df_out$name[count] <- paste0("(", dat$name[i], "/", dat$name[j], ")")
           count <- count + 1
-          df_out$X[, count] <- dat$X[, j] / dat$X[, i]
+          
+          feature_plain <- dat$X[, j] / dat$X[, i]
+      # Check heuristic
+          if (heuristic_check(feature_plain, y)) {
+            df_out$X[, count] <- optimize_constant(
+              feature_func = function(X, c) (X[, 2] + c) / X[, 1],
+              X_cols = dat$X[, c(i, j)],
+              y = y,
+              candidate_constants = candidate_constants
+            )
+          } else {
+            df_out$X[, count] <- feature_plain
+          }
           df_out$unit[, count] <- dat$unit[, j] - dat$unit[, i]
           df_out$name[count] <- paste0("(", dat$name[j], "/", dat$name[i], ")")
           count <- count + 1
@@ -385,7 +464,18 @@ DIVD <- function(dat) {
     if ((p_nonzero > 0) & (p_zero > 0)) {
       for (i in (p_nonzero + 1):p) {
         for (j in 1:p_nonzero) {
-          df_out$X[, count] <- dat$X[, i] / dat$X[, j]
+          feature_plain <- dat$X[, i] / dat$X[, j]
+      # Check heuristic
+          if (heuristic_check(feature_plain, y)) {
+            df_out$X[, count] <- optimize_constant(
+              feature_func = function(X, c) (X[, 1] + c) / X[, 2],
+              X_cols = dat$X[, c(i, j)],
+              y = y,
+              candidate_constants = candidate_constants
+            )
+          } else {
+            df_out$X[, count] <- feature_plain
+          }
           df_out$unit[, count] <- dat$unit[, i] - dat$unit[, j]
           df_out$name[count] <- paste0("(", dat$name[i], "/", dat$name[j], ")")
           count <- count + 1
