@@ -1039,7 +1039,8 @@ COS <- function(dat, y, candidate_constants = seq(-1, 1, by = 0.5), heuristic_th
 }
 
 
-unary <- function(data, y, sin_cos, apply_pos_opt_on_neg_x, cor_threshold = 0.2, grid_seq = seq(-1, 1, by=0.5)) {
+unary <- function(data, y, sin_cos = FALSE, apply_pos_opt_on_neg_x = TRUE, 
+                  cor_threshold = 0.2, grid_seq = seq(-1, 1, by=0.5)) {
   p <- ncol(data$X)
 
   if (p < 1) {
@@ -1063,9 +1064,13 @@ unary <- function(data, y, sin_cos, apply_pos_opt_on_neg_x, cor_threshold = 0.2,
       data$X <- cbind(data$X, data_sqrt$X, data_sqre$X,
                       data_log$X, data_exp$X, data_sin$X,
                       data_cos$X, data_inv$X, data_abs$X)
-      data$unit <- cbind(data$unit, data_sqrt$unit, data_sqre$unit,
-                         data_log$unit, data_exp$unit, data_sin$unit,
-                         data_cos$unit, data_inv$unit, data_abs$unit)
+      data$unit <- if (!is.null(data$unit)) {
+        cbind(data$unit, data_sqrt$unit, data_sqre$unit,
+          data_log$unit, data_exp$unit, data_sin$unit,
+          data_cos$unit, data_inv$unit, data_abs$unit)
+      } else {
+        NULL
+      }
       data$name <- unname(c(data$name, data_sqrt$name, data_sqre$name,
                             data_log$name, data_exp$name, data_sin$name,
                             data_cos$name, data_inv$name, data_abs$name))
@@ -1074,9 +1079,14 @@ unary <- function(data, y, sin_cos, apply_pos_opt_on_neg_x, cor_threshold = 0.2,
       data$X <- cbind(data$X, data_sqrt$X, data_sqre$X,
                       data_log$X, data_exp$X,
                       data_inv$X, data_abs$X)
-      data$unit <- cbind(data$unit, data_sqrt$unit, data_sqre$unit,
-                         data_log$unit, data_exp$unit,
-                         data_inv$unit, data_abs$unit)
+      data$unit <- if (!is.null(data$unit)) {
+        cbind(data$unit, data_sqrt$unit, data_sqre$unit,
+          data_log$unit, data_exp$unit,
+          data_inv$unit, data_abs$unit)
+      } else {
+        NULL
+      }
+
       data$name <- unname(c(data$name, data_sqrt$name, data_sqre$name,
                             data_log$name, data_exp$name,
                             data_inv$name, data_abs$name))
