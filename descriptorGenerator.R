@@ -6,14 +6,14 @@ descriptorGenerator <- function(data = NULL,
                                 verbose = TRUE) {
   if (opt == "binary") {
     if (verbose) cat("Constructing descriptors using binary operators... \n")
-    data <- binary(data, sin_cos, allowed_ops)
+    data <- binary(data, y, allowed_ops, sin_cos = FALSE)
   } else if (opt == "unary") {
     if (verbose) cat("Constructing descriptors using unary operators... \n")
     data <- unary(data, sin_cos, apply_pos_opt_on_neg_x, allowed_ops)
   } else {
     if (verbose) cat("Constructing descriptors using all operators... \n")
-    data_unary <- unary(data, sin_cos, apply_pos_opt_on_neg_x, allowed_ops)
-    data_binary <- binary(data, sin_cos, allowed_ops)
+    data_unary <- unary(data, y, sin_cos, apply_pos_opt_on_neg_x)
+    data_binary <- binary(data, y, allowed_ops, sin_cos = FALSE)
     data$X <- cbind(data_unary$X, data_binary$X)
     data$name <- c(data_unary$name, data_binary$name)
     data$unit <- cbind(data_unary$unit, data_binary$unit)
