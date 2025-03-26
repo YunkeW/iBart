@@ -216,7 +216,12 @@ iBART <- function(X = NULL, y = NULL,
     if (verbose) cat(paste("Iteration", i, "\n", sep = " "))
     #### Hold operation ####
     if ((hold > 0) & (i <= hold)) {
-      dat <- descriptorGenerator(dat, opt[i], sin_cos, apply_pos_opt_on_neg_x, verbose)
+      dat <- descriptorGenerator(dat, 
+                               opt = opt[i], 
+                               sin_cos, 
+                               apply_pos_opt_on_neg_x,
+                               allowed_ops = allowed_ops,
+                               verbose)
       dat$iBART_gen_size <- c(dat$iBART_gen_size, ncol(dat$X))
       dat$iBART_sel_size <- c(dat$iBART_sel_size, NA)
       if (verbose) cat("Skipping iBART descriptor selection... \n")
@@ -237,7 +242,7 @@ iBART <- function(X = NULL, y = NULL,
                      iter = i)
 
     ### Feature engineering via operations ###
-    dat <- descriptorGenerator(dat, opt[i], sin_cos, apply_pos_opt_on_neg_x, verbose)
+    dat <- descriptorGenerator(dat, opt[i], sin_cos, apply_pos_opt_on_neg_x, allowed_ops = allowed_ops, verbose)
     dat$iBART_gen_size <- c(dat$iBART_gen_size, ncol(dat$X))
   }
 
